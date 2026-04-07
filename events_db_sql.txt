@@ -1,0 +1,28 @@
+-- EVENTS TABLE
+CREATE TABLE events (
+    evCode INT AUTO_INCREMENT PRIMARY KEY,
+    evName VARCHAR(100),
+    evDate DATE,
+    evVenue VARCHAR(100),
+    evRFee DECIMAL(10,2)
+);
+
+-- PARTICIPANTS TABLE
+CREATE TABLE participants (
+    partID INT AUTO_INCREMENT PRIMARY KEY,
+    evCode INT,
+    partFName VARCHAR(50),
+    partLName VARCHAR(50),
+    partDRate DECIMAL(5,2),
+    FOREIGN KEY (evCode) REFERENCES events(evCode) ON DELETE CASCADE
+);
+
+-- REGISTRATION TABLE
+CREATE TABLE registration (
+    regCode INT AUTO_INCREMENT PRIMARY KEY,
+    partID INT,
+    regDate DATE,
+    regFeePaid DECIMAL(10,2),
+    regPMode VARCHAR(20),
+    FOREIGN KEY (partID) REFERENCES participants(partID) ON DELETE CASCADE
+);
