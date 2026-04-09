@@ -1,5 +1,31 @@
 <?php include 'db.php'; ?>
 
+<?php
+// ADD EVENT
+if(isset($_POST['add'])){
+    $conn->query("INSERT INTO events(evName,evDate,evVenue,evRFee)
+    VALUES('{$_POST['name']}','{$_POST['date']}','{$_POST['venue']}','{$_POST['fee']}')");
+}
+
+// DELETE EVENT
+if(isset($_GET['del'])){
+    $conn->query("DELETE FROM events WHERE evCode={$_GET['del']}");
+    header("Location: events.php");
+}
+
+// UPDATE EVENT
+if(isset($_POST['update'])){
+    $conn->query("UPDATE events SET 
+        evName='{$_POST['name']}',
+        evDate='{$_POST['date']}',
+        evVenue='{$_POST['venue']}',
+        evRFee='{$_POST['fee']}'
+        WHERE evCode={$_POST['id']}
+    ");
+    header("Location: events.php");
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,38 +45,49 @@
     <button name="add" class="btn btn-primary">Add</button>
 </form>
 
-<?php
-if(isset($_POST['add'])){
-    $conn->query("INSERT INTO events(evName,evDate,evVenue,evRFee)
-    VALUES('{$_POST['name']}','{$_POST['date']}','{$_POST['venue']}','{$_POST['fee']}')");
-}
-?>
-
 <hr>
 
 <h3>Event List</h3>
 <table class="table table-bordered">
 <tr>
-    <th>Name</th><th>Date</th><th>Venue</th><th>Fee</th><th>Action</th>
+    <th>Name</th>
+    <th>Date</th>
+    <th>Venue</th>
+    <th>Fee</th>
+    <th>Action</th>
 </tr>
 
 <?php
 $res = $conn->query("SELECT * FROM events");
-while($row = $res->fetch_assoc()){
-    echo "<tr>
-        <td>{$row['evName']}</td>
-        <td>{$row['evDate']}</td>
-        <td>{$row['evVenue']}</td>
-        <td>{$row['evRFee']}</td>
-        <td><a href='?del={$row['evCode']}' class='btn btn-danger btn-sm'>Delete</a></td>
-    </tr>";
-}
 
-if(isset($_GET['del'])){
-    $conn->query("DELETE FROM events WHERE evCode={$_GET['del']}");
-    header("Location: events.php");
-}
+while($row = $res->fetch_assoc()){
 ?>
+
+<tr>
+<form method="POST">
+    <td>
+        <input type="text" name="name" value="<?= $row['evName'] ?>" class="form-control">
+    </td>
+    <td>
+        <input type="date" name="date" value="<?= $row['evDate'] ?>" class="form-control">
+    </td>
+    <td>
+        <input type="text" name="venue" value="<?= $row['evVenue'] ?>" class="form-control">
+    </td>
+    <td>
+        <input type="number" step="0.01" name="fee" value="<?= $row['evRFee'] ?>" class="form-control">
+    </td>
+
+    <td>
+        <input type="hidden" name="id" value="<?= $row['evCode'] ?>">
+        <button name="update" class="btn btn-success btn-sm">Update</button>
+        <a href="?del=<?= $row['evCode'] ?>" class="btn btn-danger btn-sm"
+           onclick="return confirm('Delete this event?')">Delete</a>
+    </td>
+</form>
+</tr>
+
+<?php } ?>
 
 </table>
 
